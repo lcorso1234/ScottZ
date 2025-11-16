@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Scott Zaleski | Steam Marketing",
+  title: "Scott Zaleski | Hawk Media",
   description:
-    'Digital business card for Scott "Z" Zaleski of Steam Marketing - marketing with energy mastery and author of Low Pressure Sales.',
+    'Digital business card for Scott "Z" Zaleski of Hawk Media - marketing with energy mastery and author of Low Pressure Sales.',
 };
 
 export default function RootLayout({

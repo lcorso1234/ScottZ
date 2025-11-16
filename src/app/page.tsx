@@ -9,15 +9,26 @@ const details: CardDetail[] = [
   { label: "First Name", value: "Scott" },
   { label: "Last Name", value: "Zaleski" },
   { label: "AKA", value: "Z" },
-  { label: "Company", value: "Steam Marketing" },
+  { label: "Company", value: "Hawk Media" },
+  {
+    label: "Email",
+    value: (
+      <a
+        className="text-white transition-colors hover:text-[var(--accent)]"
+        href="mailto:scottzaleskiwins@gmail.com"
+      >
+        scottzaleskiwins@gmail.com
+      </a>
+    ),
+  },
   {
     label: "Phone",
     value: (
       <a
         className="text-white transition-colors hover:text-[var(--accent)]"
-        href="tel:+17732161427"
+        href="tel:+17084917521"
       >
-        1.773.216.1427
+        708.491.7521
       </a>
     ),
   },
@@ -36,7 +47,7 @@ export default function Home() {
 
         <header className="mb-6 flex flex-col gap-1">
           <p className="text-[0.8rem] uppercase tracking-[0.4em] text-[var(--muted)]">
-            Steam Marketing
+            Hawk Media
           </p>
           <p className="text-[0.72rem] uppercase tracking-[0.4em] text-[var(--accent)]">
             aka Z
