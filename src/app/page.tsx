@@ -1,6 +1,11 @@
 "use client";
 
-import { useCallback, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+} from "react";
 
 type CardDetail = {
   label: string;
@@ -12,38 +17,29 @@ const details: CardDetail[] = [
   { label: "Last Name", value: "Zaleski" },
 ];
 
-const formatDateForICalendar = (date: Date) =>
-  date.toISOString().split("T")[0]?.replace(/-/g, "");
+const meetingTextTemplate = `Hey Scott - this is [Your Name]. I would love to connect about marketing with energy mastery and see how we might work together.
 
-const formatDateTimeForICalendar = (date: Date) =>
-  date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+Do you have 15 minutes this week for a quick call? Happy to work around your schedule.`;
 
-const buildCalendarInvite = () => {
-  const now = new Date();
-  const start = new Date(now);
-  start.setDate(start.getDate() + 1);
-  start.setHours(0, 0, 0, 0);
+const smsRecipient = "+17084917521";
 
-  const end = new Date(start);
-  end.setDate(end.getDate() + 1);
+const canUseSmsLinks = () =>
+  typeof navigator !== "undefined" &&
+  /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//ScottZ//ContactCard//EN",
-    "CALSCALE:GREGORIAN",
-    "BEGIN:VEVENT",
-    `UID:${formatDateTimeForICalendar(now)}@scottzaleski.com`,
-    `DTSTAMP:${formatDateTimeForICalendar(now)}`,
-    `DTSTART;VALUE=DATE:${formatDateForICalendar(start)}`,
-    `DTEND;VALUE=DATE:${formatDateForICalendar(end)}`,
-    "SUMMARY:Follow up with Scott Zaleski",
-    "DESCRIPTION:Reserve time to connect with Scott about marketing with energy mastery.",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ];
+const buildSmsUrl = (message: string) => {
+  if (typeof navigator === "undefined") {
+    return null;
+  }
 
-  return lines.join("\r\n");
+  const userAgent = navigator.userAgent || "";
+  const isIos =
+    /iPad|iPhone|iPod/.test(userAgent) ||
+    (userAgent.includes("Mac") && navigator.maxTouchPoints > 1);
+  const separator = isIos ? "&" : "?";
+  const encodedMessage = encodeURIComponent(message);
+
+  return `sms:${smsRecipient}${separator}body=${encodedMessage}`;
 };
 
 const initiateDownload = (url: string, filename: string) => {
@@ -57,17 +53,36 @@ const initiateDownload = (url: string, filename: string) => {
 };
 
 export default function Home() {
-  const handleSaveContactAndEvent = useCallback(
-    (event: ReactMouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      initiateDownload("/scott-zaleski.vcf", "scott-zaleski.vcf");
+  const [textTemplateStatus, setTextTemplateStatus] = useState<
+    "idle" | "downloaded" | "sms"
+  >("idle");
 
-      const calendarUrl = URL.createObjectURL(
-        new Blob([buildCalendarInvite()], { type: "text/calendar" })
+  const handleSaveContactAndTextTemplate = useCallback(
+    async (event: ReactMouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      const downloadContactCard = () =>
+        initiateDownload("/scott-zaleski.vcf", "scott-zaleski.vcf");
+
+      if (canUseSmsLinks()) {
+        const smsUrl = buildSmsUrl(meetingTextTemplate);
+        if (smsUrl) {
+          setTextTemplateStatus("sms");
+          setTimeout(downloadContactCard, 250);
+          // Using assign keeps navigation in the same tab and reliably opens the SMS composer.
+          window.location.assign(smsUrl);
+          return;
+        }
+      }
+
+      downloadContactCard();
+
+      const messageUrl = URL.createObjectURL(
+        new Blob([meetingTextTemplate], { type: "text/plain" })
       );
 
-      initiateDownload(calendarUrl, "follow-up-with-scott.ics");
-      setTimeout(() => URL.revokeObjectURL(calendarUrl), 0);
+      initiateDownload(messageUrl, "meeting-text-template.txt");
+      setTimeout(() => URL.revokeObjectURL(messageUrl), 0);
+      setTextTemplateStatus("downloaded");
     },
     []
   );
@@ -118,10 +133,19 @@ export default function Home() {
           className="animate-jiggle mt-6 block w-full rounded-lg bg-[linear-gradient(120deg,var(--accent),var(--accent-lime),var(--accent-gold))] px-6 py-3 text-center text-base font-semibold text-[#1c1f00] shadow-[0_15px_35px_rgba(255,210,76,0.45)] transition-transform hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]"
           href="/scott-zaleski.vcf"
           download
-          onClick={handleSaveContactAndEvent}
+          onClick={handleSaveContactAndTextTemplate}
         >
-          Save Contact + Calendar Reminder
+          Save Contact + Text Scott
         </a>
+
+        {textTemplateStatus !== "idle" && (
+          <p className="mt-3 text-center text-sm text-[var(--muted)]">
+            {textTemplateStatus === "sms" &&
+              "Opening your messaging app with the template."}
+            {textTemplateStatus === "downloaded" &&
+              "Meeting text template downloaded for you."}
+          </p>
+        )}
 
         <footer className="mt-4 space-y-1 text-center text-[0.72rem] uppercase tracking-[0.35em] text-[var(--muted)]">
           <p>
