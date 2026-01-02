@@ -58,7 +58,6 @@ const initiateDownload = (url: string, filename: string) => {
 export default function Home() {
   const [saveStatus, setSaveStatus] = useState<"idle" | "saved">("idle");
   const [showSmsPrompt, setShowSmsPrompt] = useState(false);
-  const [smsPrompting, setSmsPrompting] = useState(false);
   const [editableMessage, setEditableMessage] = useState<string>(messageTemplate);
   const [userName, setUserName] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
@@ -90,56 +89,10 @@ export default function Home() {
       await downloadContactCardViaFetch();
       setSaveStatus("saved");
 
-      // On mobile: try to open the SMS composer immediately (user gesture), with a short fallback to a manual prompt/modal
+      // On mobile: show the SMS prompt modal after vCard is saved
       if (canUseSmsLinks()) {
         setEditableMessage(messageTemplate);
-
-        const finalMessage = messageTemplate;
-        const encoded = encodeURIComponent(finalMessage);
-        const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
-        const isIos = /iPad|iPhone|iPod/.test(userAgent) || (userAgent.includes('Mac') && (navigator as any).maxTouchPoints > 1);
-        const urls = [
-          `sms:${smsRecipient}${isIos ? '&' : '?'}body=${encoded}`,
-          `sms:${smsRecipient}?body=${encoded}`,
-          `smsto:${smsRecipient}?body=${encoded}`,
-        ];
-
-        // Indicate we're attempting to open the messaging app
-        setSmsPrompting(true);
-
-        // Try each URL by creating an anchor and assigning location
-        (async () => {
-          let opened = false;
-          for (const url of urls) {
-            try {
-              const a = document.createElement('a');
-              a.href = url;
-              a.style.display = 'none';
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-
-              // Also try location assignment
-              try {
-                window.location.href = url;
-              } catch (e) {
-                // ignore
-              }
-
-              opened = true;
-              break;
-            } catch (e) {
-              // ignore and try next
-            }
-          }
-
-          // Wait briefly to see whether the messaging app opened; if it didn't, show the manual prompt
-          setTimeout(() => {
-            setSmsPrompting(false);
-            // If the page is still visible, show the modal to let user edit/copy/send manually
-            setShowSmsPrompt(true);
-          }, 1200);
-        })();
+        setShowSmsPrompt(true);
       }
     },
     []
@@ -202,11 +155,7 @@ export default function Home() {
             <p className="mt-3 text-center text-sm text-[var(--muted)]">
               Contact saved to your device.
             </p>
-            {smsPrompting && (
-              <p className="mt-2 text-center text-sm text-[var(--muted)]">
-                Opening your messaging app with the template…
-              </p>
-            )}
+
             {smsCopied && (
               <p className="mt-2 text-center text-sm text-[var(--muted)]">
                 Message copied to clipboard — open your messaging app and paste it into a new message.
