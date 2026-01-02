@@ -169,32 +169,32 @@ export default function Home() {
           <div
             role="dialog"
             aria-modal="true"
-            className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black/50 p-4"
+            className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-[#2b2f33]/95 p-4"
           >
-            <div className="w-full max-w-sm rounded-xl bg-white/5 p-6 text-white">
-              <h3 className="mb-3 text-lg font-semibold">Contact saved</h3>
-              <p className="mb-3 text-sm text-[var(--muted)]">
+            <div className="w-full max-w-sm rounded-xl bg-[#1f2224] p-6 text-white">
+              <h3 className="mb-3 text-lg font-semibold text-[#39ff14]">Contact saved</h3>
+              <p className="mb-3 text-sm text-white/90">
                 The contact was saved. Edit your message below and add your name and email, then open your messaging app.
               </p>
 
-              <label className="block mb-2 text-sm text-[var(--muted)]">
+              <label className="block mb-2 text-sm text-[#39ff14]">
                 Your name
               </label>
               <input
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="Your name"
-                className="mb-3 w-full rounded-md bg-black/20 p-2 text-sm text-white"
+                className="mb-3 w-full rounded-md bg-[#0d1112] p-2 text-sm text-white ring-1 ring-[#39ff14]/10 focus:ring-2 focus:ring-[#39ff14]/40"
               />
 
-              <label className="block mb-2 text-sm text-[var(--muted)]">
+              <label className="block mb-2 text-sm text-[#39ff14]">
                 Your email
               </label>
               <input
                 value={userEmail}
                 onChange={(e) => setUserEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="mb-3 w-full rounded-md bg-black/20 p-2 text-sm text-white"
+                className="mb-3 w-full rounded-md bg-[#0d1112] p-2 text-sm text-white ring-1 ring-[#39ff14]/10 focus:ring-2 focus:ring-[#39ff14]/40"
               />
 
               <label className="sr-only" htmlFor="sms-template">
@@ -204,13 +204,13 @@ export default function Home() {
                 id="sms-template"
                 value={editableMessage}
                 onChange={(e) => setEditableMessage(e.target.value)}
-                className="mb-4 h-28 w-full resize-none rounded-md bg-black/20 p-3 text-sm text-white"
+                className="mb-4 h-28 w-full resize-none rounded-md bg-[#0d1112] p-3 text-sm text-white ring-1 ring-[#39ff14]/10 focus:ring-2 focus:ring-[#39ff14]/40"
               />
 
               <div className="flex justify-center gap-3">
                 <button
                   type="button"
-                  className="rounded-lg bg-[linear-gradient(120deg,var(--accent),var(--accent-lime))] px-4 py-2 font-semibold text-[#1c1f00]"
+                  className="rounded-lg bg-[#39ff14] px-4 py-2 font-semibold text-[#061a02]"
                   onClick={async () => {
                     // Replace placeholders with entered values (or leave placeholders if blank)
                     const finalMessage = editableMessage
@@ -271,7 +271,7 @@ export default function Home() {
                 </button>
                 <button
                   type="button"
-                  className="rounded-lg bg-white/5 px-4 py-2 font-semibold text-[var(--muted)]"
+                  className="rounded-lg bg-transparent px-4 py-2 font-semibold text-white border border-[#39ff14]/20"
                   onClick={() => setShowSmsPrompt(false)}
                 >
                   Close
